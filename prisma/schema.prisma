@@ -1,0 +1,46 @@
+datasource db {
+    url      = env("DATABASE_URL")
+    provider = "postgresql"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Users {
+  id             String     @unique   @default(uuid())
+  email          String     @unique 
+  password       String
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt()
+
+  @@map("users")
+}
+
+model Post {
+  id         Int                 @id @default(autoincrement())
+  title      String
+  categories CategoriesOnPosts[]
+
+  @@map("post")
+}
+
+model Category {
+  id    Int                 @id @default(autoincrement())
+  name  String
+  posts CategoriesOnPosts[]
+
+  @@map("category")
+}
+
+model CategoriesOnPosts {
+  post       Post     @relation(fields: [postId], references: [id])
+  postId     Int 
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int 
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  @@id([postId, categoryId])
+  @@map("category_post")
+}
